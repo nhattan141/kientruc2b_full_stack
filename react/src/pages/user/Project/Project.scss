@@ -1,0 +1,55 @@
+.project {
+    margin-bottom: 15px;
+    padding: 0 10px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+
+    .slick-slider {
+        height: 100%;
+
+        &:hover>.slide-btn-left,
+        &:hover>.slide-btn-right {
+            opacity: .7;
+        }
+
+        .slide-btn-left,
+        .slide-btn-right {
+            position: absolute;
+            z-index: 200;
+            width: 10%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            min-width: 75px;
+            transition: all 250ms ease-in-out;
+            opacity: 0;
+            min-width: 75px;
+            color: white;
+            font-weight: bold;
+            font-size: 100px;
+            text-align: center;
+            line-height: 400px;
+            cursor: pointer;
+        }
+
+        .slide-btn-left {
+            display: block;
+            left: 0;
+        }
+
+        .slide-btn-right {
+            top: 0;
+            right: 0;
+        }
+
+        .slick-slide {
+            margin: 0 10px;
+        }
+    }
+
+
+    .img-box {
+        height: 400px;
+    }
+}

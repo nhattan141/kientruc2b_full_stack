@@ -1,0 +1,93 @@
+.bubble-container {
+    position: fixed;
+    bottom: -200px;
+    right: 30px;
+    height: 50px;
+    width: 50px;
+    z-index: -999;
+    transition: all 500ms ease-in-out;
+
+    .bubble-content {
+
+        .bubble-wrapper {
+            position: relative;
+
+            input[type="checkbox"] {
+                position: absolute;
+                opacity: 0;
+
+                &:checked~label {
+                    background-color: var(--black);
+                    color: white;
+                    box-shadow: 0 0 50px var(--black);
+                }
+
+                &:checked~.bubble-items :nth-child(1):is(button) {
+                    transform: translateY(-65px);
+                }
+
+                &:checked~.bubble-items :nth-child(2):is(button) {
+                    transform: translateY(-130px);
+                }
+            }
+
+            label {
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                background: var(--white);
+                color: var(--black);
+                border-radius: 50%;
+                z-index: 103;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 250ms ease-in-out;
+                box-shadow: 0 0 50px #ccc;
+
+                &:hover {
+                    background-color: var(--black);
+                    color: white;
+                }
+            }
+
+            .bubble-items {
+                &:nth-child(1) {
+                    z-index: 102;
+                }
+
+                &:nth-child(2) {
+                    z-index: 101;
+                }
+
+                button {
+                    position: absolute;
+                    transition: all .5s;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    outline: none;
+                    border: none;
+                    width: 50px;
+                    height: 50px;
+                    background: var(--white);
+                    color: var(--black);
+                    border-radius: 50%;
+                    transition: all 250ms ease-in-out;
+                    box-shadow: 0 0 50px #ccc;
+                    // transition-delay: var(--delay);
+
+                    &:hover {
+                        background-color: var(--black);
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.show {
+    bottom: 50px;
+    z-index: 100;
+}

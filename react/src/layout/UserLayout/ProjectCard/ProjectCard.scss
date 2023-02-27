@@ -1,0 +1,81 @@
+.project-card {
+    height: 300px;
+    width: 100%;
+    display: flex;
+    box-shadow: rgb(38 57 77) 0px 20px 30px -10px;
+    flex-direction: column;
+    align-items: center;
+
+    .project-img {
+        width: 100%;
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+        transition: all 500ms ease-in-out;
+
+        &:before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 0px;
+            height: 0px;
+            border-top: solid 3px transparent;
+            border-left: solid 3px transparent;
+            transition: all 500ms ease-in-out;
+        }
+
+        &:after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 0px;
+            height: 0px;
+            transition: all 500ms ease-in-out;
+            border-bottom: solid 3px transparent;
+            border-right: solid 3px transparent;
+        }
+
+        &:hover:before {
+            width: 100px;
+            height: 50px;
+            z-index: 1;
+            border-top: solid 3px var(--white);
+            border-left: solid 3px var(--white);
+        }
+
+        &:hover:after {
+            width: 100px;
+            height: 50px;
+            z-index: 1;
+            border-bottom: solid 3px var(--white);
+            border-right: solid 3px var(--white);
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 500ms ease-in-out;
+
+            &:hover {
+                filter: brightness(.4);
+                transform: scale(1.5);
+            }
+        }
+    }
+
+    .project-body {
+        width: 80%;
+        height: 80px;
+        display: flex;
+        padding: 10px;
+        text-align: left;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: flex-start;
+    }
+}
