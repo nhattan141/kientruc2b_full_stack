@@ -32,26 +32,30 @@ const theme = createTheme({
     },
 });
 
-export default function SignInSide() {
-    const { setCurrentUser, setUserToken, currentUser, userToken } = useStateContext();
+export default function SignUpSide() {
+    const { setCurrentUser, setUserToken } = useStateContext();
 
-    const [login, setLogin] = React.useState({
+    const [signup, setSignup] = React.useState({
         email: "",
-        password: ""
+        name: "",
+        password: "",
+        confirmPassword: ""
     });
     const [error, setError] = React.useState({ __html: '' });
 
     const handleOnChangeInput = (event) => {
-        setLogin({ ...login, [event.target.name]: event.target.value });
+        setSignup({ ...signup, [event.target.name]: event.target.value });
     };
 
     const handleSubmit = (event) => {
         event.preventDefault();
         setError({ __html: '' });
 
-        axiosClient.post('/login', {
-            email: login.email,
-            password: login.password
+        axiosClient.post('/signup', {
+            name: signup.name,
+            email: signup.email,
+            password: signup.password,
+            password_confirmation: signup.confirmPassword
         })
             .then(({ data }) => {
                 setCurrentUser(data.user);
@@ -100,7 +104,7 @@ export default function SignInSide() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            Đăng nhập
+                            Đăng ký
                         </Typography>
                         {error.__html && (
                             <Grid
@@ -130,12 +134,23 @@ export default function SignInSide() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="email"
+                                id="name"
                                 label="Tên tài khoản"
+                                name="name"
+                                autoComplete="name"
+                                autoFocus
+                                value={signup.name}
+                                onChange={handleOnChangeInput}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email"
                                 name="email"
                                 autoComplete="email"
-                                autoFocus
-                                value={login.email}
+                                value={signup.email}
                                 onChange={handleOnChangeInput}
                             />
                             <TextField
@@ -146,13 +161,19 @@ export default function SignInSide() {
                                 label="Mật khẩu"
                                 type="password"
                                 id="password"
-                                autoComplete="current-password"
-                                value={login.password}
+                                value={signup.password}
                                 onChange={handleOnChangeInput}
                             />
-                            <FormControlLabel
-                                control={<Checkbox value="remember" color="primary" />}
-                                label="Nhớ tài khoản"
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="confirmPassword"
+                                label="Xác nhận mật khẩu"
+                                type="password"
+                                id="confirmPassword"
+                                value={signup.confirmPassword}
+                                onChange={handleOnChangeInput}
                             />
                             <Button
                                 type="submit"
@@ -160,7 +181,7 @@ export default function SignInSide() {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2, }}
                             >
-                                Đăng nhập
+                                Đăng ký
                             </Button>
                             <Copyright sx={{ mt: 5 }} />
                         </Box>

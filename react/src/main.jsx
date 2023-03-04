@@ -4,13 +4,24 @@ import './index.css';
 import App from './App';
 // import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
+import { ContextProiver } from './contexts/ContextProvider';
+import { RouterProvider } from 'react-router-dom';
+import Routes from './routes';
+import router from './router';
+import Loader from './layout/UserLayout/Loader/Loader';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ContextProiver>
+      {/* <BrowserRouter>
+        <App />
+      </BrowserRouter> */}
+      <React.Suspense fallback={<Loader />}>
+        <RouterProvider router={router} />
+      </React.Suspense>
+    </ContextProiver>
   </React.StrictMode>
 );
 

@@ -11,13 +11,12 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import Link from '@mui/material/Link';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 import logoA from '../../../assets/imgs/logoA.png';
-
-const pages = ['Dự án'];
-const settings = ['Đăng xuất'];
+import { useNavigate } from "react-router-dom";
 
 const darkTheme = createTheme({
     palette: {
@@ -28,7 +27,19 @@ const darkTheme = createTheme({
     },
 });
 
-const HeaderAdmin = () => {
+const pages = [
+    {
+        link: '/admin/projects',
+        name: 'Dự án'
+    },
+];
+const settings = ['Đăng xuất'];
+
+const HeaderAdmin = (props) => {
+    let navigateTo = useNavigate();
+
+    const { currentUser, handleLogout } = props;
+
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -72,7 +83,6 @@ const HeaderAdmin = () => {
                         >
                             2B+ARCHI
                         </Typography>
-
                         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                             <IconButton
                                 size="large"
@@ -102,9 +112,14 @@ const HeaderAdmin = () => {
                                     display: { xs: 'block', md: 'none' },
                                 }}
                             >
-                                {pages.map((page) => (
-                                    <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                        <Typography textAlign="center">{page}</Typography>
+                                {pages.map((page, index) => (
+                                    <MenuItem key={index} onClick={handleCloseNavMenu}>
+                                        <Link
+                                            sx={{ color: 'white' }}
+                                            underline="none"
+                                            href={page.link}>
+                                            <Typography textAlign="center">{page.name}</Typography>
+                                        </Link>
                                     </MenuItem>
                                 ))}
                             </Menu>
@@ -131,33 +146,44 @@ const HeaderAdmin = () => {
                             2B+ARCHI
                         </Typography>
                         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                            {pages.map((page) => (
+                            {pages.map((page, index) => (
                                 <Button
-                                    key={page}
-                                    onClick={handleCloseNavMenu}
+                                    key={index}
+                                    onClick={() => handleCloseNavMenu(page.link)}
                                     sx={{ my: 2, color: 'white', display: 'block' }}
                                 >
-                                    {page}
+                                    <Link
+                                        sx={{ color: 'white' }}
+                                        underline="none"
+                                        href={page.link}>
+                                        {page.name}
+                                    </Link>
                                 </Button>
                             ))}
                         </Box>
-
-                        <Box sx={{ flexGrow: 0 }}>
+                        <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center' }}>
+                            <Typography
+                                variant="p"
+                                noWrap
+                                component="a"
+                                href=""
+                                sx={{
+                                    mr: 2,
+                                    display: { xs: 'none', md: 'flex' },
+                                    fontFamily: 'Montserrat, sans-serif',
+                                    flexGrow: 1,
+                                    fontWeight: 200,
+                                    letterSpacing: '.3rem',
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                }}
+                            >
+                                {currentUser.name}
+                            </Typography>
                             <Tooltip title="Open settings">
-                                <IconButton
-                                    size="large"
-                                    aria-label="account of current user"
-                                    aria-controls="menu-appbar"
-                                    aria-haspopup="true"
-                                    onClick={handleOpenUserMenu}
-                                    color="inherit"
-                                    sx={{ p: 0 }}
-                                >
-                                    <AccountCircle />
+                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, background: 'white' }}>
+                                    <Avatar alt="Remy Sharp" src={currentUser.avatar} />
                                 </IconButton>
-                                {/* <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                                </IconButton> */}
                             </Tooltip>
                             <Menu
                                 sx={{ mt: '45px' }}
@@ -175,8 +201,30 @@ const HeaderAdmin = () => {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
+                                <Typography
+                                    variant="p"
+                                    noWrap
+                                    component="a"
+                                    href=""
+                                    sx={{
+                                        display: {
+                                            xs: 'flex',
+                                            md: 'none',
+                                            color: 'white',
+                                            justifyContent: 'center'
+                                        },
+                                        fontFamily: 'Montserrat, sans-serif',
+                                        flexGrow: 1,
+                                        fontWeight: 200,
+                                        letterSpacing: '.3rem',
+                                        color: 'inherit',
+                                        textDecoration: 'none',
+                                    }}
+                                >
+                                    {currentUser.name}
+                                </Typography>
                                 {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                    <MenuItem key={setting} onClick={handleLogout}>
                                         <Typography textAlign="center">{setting}</Typography>
                                     </MenuItem>
                                 ))}
