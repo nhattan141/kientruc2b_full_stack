@@ -32,7 +32,7 @@ const theme = createTheme({
     },
 });
 
-export default function SignInSide() {
+const SignInSide = () => {
     const { setCurrentUser, setUserToken, currentUser, userToken } = useStateContext();
 
     const [login, setLogin] = React.useState({
@@ -150,10 +150,10 @@ export default function SignInSide() {
                                 value={login.password}
                                 onChange={handleOnChangeInput}
                             />
-                            <FormControlLabel
+                            {/* <FormControlLabel
                                 control={<Checkbox value="remember" color="primary" />}
                                 label="Nhớ tài khoản"
-                            />
+                            /> */}
                             <Button
                                 type="submit"
                                 fullWidth
@@ -169,4 +169,6 @@ export default function SignInSide() {
             </Grid>
         </ThemeProvider>
     );
-}
+};
+
+export default SignInSide;

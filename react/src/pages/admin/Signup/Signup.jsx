@@ -32,7 +32,7 @@ const theme = createTheme({
     },
 });
 
-export default function SignUpSide() {
+const SignUpSide = () => {
     const { setCurrentUser, setUserToken } = useStateContext();
 
     const [signup, setSignup] = React.useState({
@@ -190,4 +190,6 @@ export default function SignUpSide() {
             </Grid>
         </ThemeProvider>
     );
-}
+};
+
+export default SignUpSide;
