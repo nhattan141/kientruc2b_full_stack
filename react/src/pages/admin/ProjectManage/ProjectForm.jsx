@@ -15,6 +15,11 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
+import Tooltip from '@mui/material/Tooltip';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axiosClient from '../../../axios.js';
 import { useStateContext } from '../../../contexts/ContextProvider';
@@ -35,23 +40,64 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const ProjectForm = (props) => {
-    const { setCurrentUser, setUserToken, currentUser, userToken } = useStateContext();
-
     //thông tin dự án (project information)
     const [prjInfor, setPrjInfor] = React.useState({
         name: "",
         address: "",
         frontImage: "",
-        interiorImage: ""
+        interiorImage: [],
+        frontImgPreview: "",
+        interImgPreview: [],
     });
     const [error, setError] = React.useState({ __html: '' });
+    const [listUrl, setListUrl] = React.useState([]);
 
     const handleOnChangeInput = (event) => {
-        setPrjInfor({ ...prjInfor, [event.target.name]: event.target.value });
+        if (event.target.name == "frontImage") {
+            let data = event.target.files;
+            let file = data[0];
+            if (file) {
+                let frontImgURL = URL.createObjectURL(file);
+                setPrjInfor({
+                    ...prjInfor,
+                    frontImgPreview: frontImgURL,
+                    frontImage: file
+                });
+            }
+        } else if (event.target.name == "interImgPreview") {
+            let data = event.target.files;
+            let listURL = [], listFile = [];
+            for (const i of Object.keys(data)) {
+                let file = data[i];
+                let interImgURL = URL.createObjectURL(file);
+                listURL.unshift(interImgURL);
+                listFile.unshift(file);
+            }
+            setPrjInfor({
+                ...prjInfor,
+                interImgPreview: [...listURL, ...prjInfor.interImgPreview],
+                interiorImage: [...listFile, ...prjInfor.interiorImage]
+            });
+        }
+        else setPrjInfor({ ...prjInfor, [event.target.name]: event.target.value });
     };
 
+    //chuc nang xoa hinh noi that
+    const handleDeleteImg = (index) => {
+        prjInfor.interImgPreview.splice(index, 1);
+        prjInfor.interiorImage.splice(index, 1);
+        setPrjInfor({
+            ...prjInfor,
+            interImgPreview: [...prjInfor.interImgPreview],
+            interiorImage: [...prjInfor.interiorImage]
+        });
+    }
+
+    React.useEffect(() => {
+        setListUrl(prjInfor.interImgPreview);
+    }, [prjInfor.interImgPreview]);
+
     const handleSubmit = (event) => {
-        console.log('save');
         props.handleCloseForm();
         // event.preventDefault();
         // setError({ __html: '' });
@@ -173,28 +219,85 @@ const ProjectForm = (props) => {
                                     <FormControlLabel
                                         control={
                                             <IconButton color="primary" aria-label="upload picture" component="label">
-                                                <input hidden accept="image/*" type="file" />
+                                                <input
+                                                    hidden
+                                                    accept="image/*"
+                                                    type="file"
+                                                    id="frontImage"
+                                                    name="frontImage"
+                                                    onChange={handleOnChangeInput}
+                                                />
                                                 <PhotoCamera />
                                             </IconButton>
                                         }
                                         label="Thêm hình mặt tiền"
                                     />
-                                    <Box sx={{ width: '35vw', height: '30vh' }}>
-                                        <Avatar variant="rounded" sx={{ width: '100%', height: '100%' }} alt="LOGO" src='' />
+                                    <Box sx={{ width: { md: 650, xs: '100%' }, height: 450 }}>
+                                        <Avatar variant="rounded" sx={{ width: '100%', height: '100%' }} alt="LOGO" src={prjInfor.frontImgPreview} />
                                     </Box>
                                 </Box>
                                 <Box>
                                     <FormControlLabel
                                         control={
                                             <IconButton color="primary" aria-label="upload picture" component="label">
-                                                <input hidden accept="image/*" type="file" />
+                                                <input
+                                                    hidden
+                                                    accept="image/*"
+                                                    type="file"
+                                                    multiple={true}
+                                                    id="interImgPreview"
+                                                    name="interImgPreview"
+                                                    onChange={handleOnChangeInput}
+                                                />
                                                 <PhotoCamera />
                                             </IconButton>
                                         }
                                         label="Thêm hình nội thất"
                                     />
-                                    <Box sx={{ width: '35vw', height: '30vh' }}>
+                                    {/* <Box sx={{ width: '35vw', height: '30vh' }}>
                                         <Avatar variant="rounded" sx={{ width: '100%', height: '100%' }} alt="LOGO" src='' />
+                                    </Box> */}
+                                    <Box
+                                        sx={{
+                                            width: { md: 500, xs: '100%' },
+                                            height: 610,
+                                            overflowY: 'scroll',
+                                        }}
+                                    >
+                                        <ImageList cols={3} rowHeight={164}>
+                                            {listUrl
+                                                && listUrl.map((item, index) => (
+                                                    <ImageListItem key={index}>
+                                                        <img
+                                                            src={item}
+                                                            srcSet={item}
+                                                            alt="Hinh noi that"
+                                                            loading="lazy"
+                                                        />
+                                                        <ImageListItemBar
+                                                            sx={{
+                                                                background:
+                                                                    'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
+                                                                    'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+                                                            }}
+                                                            position="top"
+                                                            actionIcon={
+                                                                <Tooltip title="Xóa" placement='top-start' color='primary'>
+                                                                    <IconButton
+                                                                        sx={{ color: 'white' }}
+                                                                        aria-label="delete"
+                                                                        size="large"
+                                                                        onClick={() => { handleDeleteImg(index) }}
+                                                                    >
+                                                                        <DeleteIcon />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            }
+                                                            actionPosition="right"
+                                                        />
+                                                    </ImageListItem>
+                                                ))}
+                                        </ImageList>
                                     </Box>
                                 </Box>
                             </Box>
