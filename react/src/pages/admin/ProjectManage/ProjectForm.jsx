@@ -4,6 +4,8 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -20,11 +22,10 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axiosClient from '../../../axios.js';
-import { useStateContext } from '../../../contexts/ContextProvider';
-
-import project3 from '../../../assets/imgs/project3.jpg';
 
 // const theme = createTheme();
 const theme = createTheme({
@@ -44,6 +45,7 @@ const ProjectForm = (props) => {
     const [prjInfor, setPrjInfor] = React.useState({
         name: "",
         address: "",
+        category: "",
         frontImage: "",
         interiorImage: [],
         frontImgPreview: "",
@@ -121,6 +123,8 @@ const ProjectForm = (props) => {
         //     })
     };
 
+    console.log(prjInfor);
+
     return (
         <ThemeProvider theme={theme}>
             <Dialog
@@ -194,7 +198,7 @@ const ProjectForm = (props) => {
                                     justifyContent: 'space-around',
                                 }}
                             >
-                                <Box>
+                                <Box sx={{ width: { md: '45vw' } }}>
                                     <TextField
                                         margin="normal"
                                         required
@@ -216,6 +220,26 @@ const ProjectForm = (props) => {
                                         value={prjInfor.address}
                                         onChange={handleOnChangeInput}
                                     />
+                                    <Box>
+                                        <FormControl>
+                                            <FormLabel id="category">Loại dự án</FormLabel>
+                                            <RadioGroup
+                                                row
+                                                aria-labelledby="category"
+                                                name="category"
+                                                value={prjInfor.category}
+                                                onChange={handleOnChangeInput}
+                                            >
+                                                <FormControlLabel value="house" control={<Radio />} label="Nhà phố" />
+                                                <FormControlLabel value="villa" control={<Radio />} label="Biệt thự" />
+                                                <FormControlLabel value="office" control={<Radio />} label="Văn phòng" />
+                                                <FormControlLabel value="hotel" control={<Radio />} label="Khách sạn" />
+                                                <FormControlLabel value="build" control={<Radio />} label="Xây dựng" />
+                                                <FormControlLabel value="apartment" control={<Radio />} label="Chung cư" />
+                                                <FormControlLabel value="restaurent" control={<Radio />} label="Nhà hàng" />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </Box>
                                     <FormControlLabel
                                         control={
                                             <IconButton color="primary" aria-label="upload picture" component="label">
@@ -232,11 +256,11 @@ const ProjectForm = (props) => {
                                         }
                                         label="Thêm hình mặt tiền"
                                     />
-                                    <Box sx={{ width: { md: 650, xs: '100%' }, height: 450 }}>
+                                    <Box sx={{ width: { xs: '100%' }, height: 450 }}>
                                         <Avatar variant="rounded" sx={{ width: '100%', height: '100%' }} alt="LOGO" src={prjInfor.frontImgPreview} />
                                     </Box>
                                 </Box>
-                                <Box>
+                                <Box sx={{ width: { md: '45vw' } }}>
                                     <FormControlLabel
                                         control={
                                             <IconButton color="primary" aria-label="upload picture" component="label">
@@ -254,13 +278,10 @@ const ProjectForm = (props) => {
                                         }
                                         label="Thêm hình nội thất"
                                     />
-                                    {/* <Box sx={{ width: '35vw', height: '30vh' }}>
-                                        <Avatar variant="rounded" sx={{ width: '100%', height: '100%' }} alt="LOGO" src='' />
-                                    </Box> */}
                                     <Box
                                         sx={{
-                                            width: { md: 500, xs: '100%' },
-                                            height: 610,
+                                            width: { xs: '100%' },
+                                            height: 720,
                                             overflowY: 'scroll',
                                         }}
                                     >
