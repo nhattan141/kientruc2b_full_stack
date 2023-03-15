@@ -26,6 +26,8 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axiosClient from '../../../axios.js';
+import Alert from '@mui/material/Alert';
+import Collapse from '@mui/material/Collapse';
 
 // const theme = createTheme();
 const theme = createTheme({
@@ -45,7 +47,7 @@ const ProjectForm = (props) => {
     const [prjInfor, setPrjInfor] = React.useState({
         name: "",
         address: "",
-        category: "",
+        category_id: null,
         frontImage: "",
         interiorImage: [],
         frontImgPreview: "",
@@ -53,33 +55,73 @@ const ProjectForm = (props) => {
     });
     const [error, setError] = React.useState({ __html: '' });
     const [listUrl, setListUrl] = React.useState([]);
+    const [status, setStatus] = React.useState();
+    const [openNotice, setOpenNotice] = React.useState(false);
 
     const handleOnChangeInput = (event) => {
         if (event.target.name == "frontImage") {
+            const reader = new FileReader();
             let data = event.target.files;
             let file = data[0];
-            if (file) {
-                let frontImgURL = URL.createObjectURL(file);
+            reader.onload = () => {
                 setPrjInfor({
                     ...prjInfor,
-                    frontImgPreview: frontImgURL,
+                    frontImgPreview: reader.result,
                     frontImage: file
                 });
+
+                event.target.value = "";
             }
+            reader.readAsDataURL(file);
         } else if (event.target.name == "interImgPreview") {
             let data = event.target.files;
             let listURL = [], listFile = [];
-            for (const i of Object.keys(data)) {
-                let file = data[i];
-                let interImgURL = URL.createObjectURL(file);
-                listURL.unshift(interImgURL);
-                listFile.unshift(file);
+            let file;
+            for (let i = 0; i < data.length; i++) {
+                let reader = new FileReader();
+                file = data[i];
+                reader.onload = () => {
+                    let interImgURL = reader.result;
+                    listURL.unshift(interImgURL);
+                    listFile.unshift(file);
+                    setPrjInfor({
+                        ...prjInfor,
+                        interImgPreview: [...listURL, ...prjInfor.interImgPreview],
+                        interiorImage: [...listFile, ...prjInfor.interiorImage]
+                    });
+
+                }
+                reader.readAsDataURL(file)
             }
-            setPrjInfor({
-                ...prjInfor,
-                interImgPreview: [...listURL, ...prjInfor.interImgPreview],
-                interiorImage: [...listFile, ...prjInfor.interiorImage]
-            });
+            //     let file = data[i];
+            //     // console.log(file);
+            //     // reader.onload = () => {
+            //     //     setPrjInfor({
+            //     //         ...prjInfor,
+            //     //         interImgPreview: reader.result,
+            //     //         interiorImage: file
+            //     //     });
+
+            //     //     event.target.value = "";
+            //     // }
+            //     let interImgURL = reader.result;
+            //     listURL.unshift(interImgURL);
+            //     listFile.unshift(file);
+            // }
+            // reader.onload = () => {
+            //     setPrjInfor({
+            //         ...prjInfor,
+            //         interImgPreview: [...listURL, ...prjInfor.interImgPreview],
+            //         interiorImage: [...listFile, ...prjInfor.interiorImage]
+            //     });
+
+            //     event.target.value = "";
+            // }
+            // setPrjInfor({
+            //     ...prjInfor,
+            //     interImgPreview: [...listURL, ...prjInfor.interImgPreview],
+            //     interiorImage: [...listFile, ...prjInfor.interiorImage]
+            // });
         }
         else setPrjInfor({ ...prjInfor, [event.target.name]: event.target.value });
     };
@@ -100,30 +142,44 @@ const ProjectForm = (props) => {
     }, [prjInfor.interImgPreview]);
 
     const handleSubmit = (event) => {
-        props.handleCloseForm();
-        // event.preventDefault();
+        // props.handleCloseForm();
+        event.preventDefault();
         // setError({ __html: '' });
 
-        // axiosClient.post('/prjInfor', {
-        //     email: prjInfor.email,
-        //     password: prjInfor.password
-        // })
-        //     .then(({ data }) => {
-        //         setCurrentUser(data.user);
-        //         setUserToken(data.token);
-        //     })
-        //     .catch((error) => {
-        //         if (error.response) {
-        //             const finalErrors = Object.values(error.response.data.errors).reduce((accum, next) =>
-        //                 [...accum, ...next], []);
-        //             console.log(finalErrors);
-        //             setError({ __html: finalErrors });
-        //         }
-        //         console.error(error)
-        //     })
-    };
+        const payload = { ...prjInfor };
+        if (payload.frontImage) {
+            payload.frontImage = payload.frontImgPreview;
+        }
+        if (payload.interiorImage) {
+            payload.interiorImage = payload.interImgPreview;
+        }
 
-    console.log(prjInfor);
+        delete payload.frontImgPreview;
+        delete payload.interImgPreview;
+
+        axiosClient.post('/projects', payload)
+            .then((res) => {
+                if (res.status == 200) {
+                    setStatus(1);//success
+                    setOpenNotice(true);
+                } else {
+                    setStatus(0);//fail
+                    setOpenNotice(true);
+                }
+            })
+            .catch((error) => {
+                setStatus(0);//fail
+                setOpenNotice(true);
+                if (error.response) {
+                    const finalErrors = Object.values(error.response.data.errors).reduce((accum, next) =>
+                        [...accum, ...next], []);
+                    console.log(finalErrors);
+                    setError({ __html: finalErrors });
+                }
+                console.error(error)
+            })
+
+    };
 
     return (
         <ThemeProvider theme={theme}>
@@ -163,29 +219,6 @@ const ProjectForm = (props) => {
                                 alignItems: 'center',
                             }}
                         >
-                            {error.__html && (
-                                <Grid
-                                    container
-                                    spacing={2}
-                                    sx={{
-                                        background: "#f44336",
-                                        color: "white",
-                                        mt: 1,
-                                        p: 1,
-                                        borderRadius: 2,
-                                        width: "100%",
-                                        ml: 0
-                                    }}
-                                >
-                                    {
-                                        error.__html.map((item, index) =>
-                                            <Grid item md={12} key={index}>
-                                                {item}
-                                            </Grid>
-                                        )
-                                    }
-                                </Grid>
-                            )}
                             <Box
                                 component="form"
                                 noValidate
@@ -199,6 +232,53 @@ const ProjectForm = (props) => {
                                 }}
                             >
                                 <Box sx={{ width: { md: '45vw' } }}>
+                                    <Box sx={{ width: '100%' }}>
+                                        <Collapse in={openNotice}>
+                                            {
+                                                status === 0 ? error.__html &&
+                                                    error.__html.map((item, index) =>
+                                                        <Alert
+                                                            key={index}
+                                                            severity="error"
+                                                            action={
+                                                                <IconButton
+                                                                    aria-label="close"
+                                                                    color="inherit"
+                                                                    size="small"
+                                                                    onClick={() => {
+                                                                        setOpenNotice(!openNotice);
+                                                                    }}
+                                                                >
+                                                                    <CloseIcon fontSize="inherit" />
+                                                                </IconButton>
+                                                            }
+                                                            sx={{ mb: 2 }}
+                                                        >
+                                                            {item}
+                                                        </Alert>
+                                                    )
+                                                    :
+                                                    <Alert
+                                                        severity="success"
+                                                        action={
+                                                            <IconButton
+                                                                aria-label="close"
+                                                                color="inherit"
+                                                                size="small"
+                                                                onClick={() => {
+                                                                    setOpenNotice(!openNotice);
+                                                                }}
+                                                            >
+                                                                <CloseIcon fontSize="inherit" />
+                                                            </IconButton>
+                                                        }
+                                                        sx={{ mb: 2 }}
+                                                    >
+                                                        Thêm dự án thành công
+                                                    </Alert>
+                                            }
+                                        </Collapse>
+                                    </Box>
                                     <TextField
                                         margin="normal"
                                         required
@@ -222,21 +302,21 @@ const ProjectForm = (props) => {
                                     />
                                     <Box>
                                         <FormControl>
-                                            <FormLabel id="category">Loại dự án</FormLabel>
+                                            <FormLabel id="category_id">Loại dự án</FormLabel>
                                             <RadioGroup
                                                 row
-                                                aria-labelledby="category"
-                                                name="category"
-                                                value={prjInfor.category}
+                                                aria-labelledby="category_id"
+                                                name="category_id"
+                                                value={prjInfor.category_id}
                                                 onChange={handleOnChangeInput}
                                             >
-                                                <FormControlLabel value="house" control={<Radio />} label="Nhà phố" />
-                                                <FormControlLabel value="villa" control={<Radio />} label="Biệt thự" />
-                                                <FormControlLabel value="office" control={<Radio />} label="Văn phòng" />
-                                                <FormControlLabel value="hotel" control={<Radio />} label="Khách sạn" />
-                                                <FormControlLabel value="build" control={<Radio />} label="Xây dựng" />
-                                                <FormControlLabel value="apartment" control={<Radio />} label="Chung cư" />
-                                                <FormControlLabel value="restaurent" control={<Radio />} label="Nhà hàng" />
+                                                <FormControlLabel value={1} control={<Radio />} label="Nhà phố" />
+                                                <FormControlLabel value={2} control={<Radio />} label="Biệt thự" />
+                                                <FormControlLabel value={3} control={<Radio />} label="Văn phòng" />
+                                                <FormControlLabel value={4} control={<Radio />} label="Khách sạn" />
+                                                <FormControlLabel value={5} control={<Radio />} label="Xây dựng" />
+                                                <FormControlLabel value={6} control={<Radio />} label="Chung cư" />
+                                                <FormControlLabel value={7} control={<Radio />} label="Nhà hàng" />
                                             </RadioGroup>
                                         </FormControl>
                                     </Box>

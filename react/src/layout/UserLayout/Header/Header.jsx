@@ -41,7 +41,7 @@ const Header = () => {
                                 <ul>
                                     <li><Link to={'/category/house'}>Nhà phố</Link></li>
                                     <li><Link to={'/category/villa'}>Biệt thự</Link></li>
-                                    <li><Link to={'/category/shop'}>Văn phòng</Link></li>
+                                    <li><Link to={'/category/office'}>Văn phòng</Link></li>
                                     <li><Link to={'/category/hotel'}>Khách sạn</Link></li>
                                 </ul>
                             </div>
