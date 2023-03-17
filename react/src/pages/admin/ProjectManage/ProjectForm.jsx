@@ -53,7 +53,7 @@ const ProjectForm = (props) => {
         frontImgPreview: "",
         interImgPreview: [],
     });
-    const [error, setError] = React.useState({ __html: '' });
+    const [error, setError] = React.useState({ __html: [] });
     const [listUrl, setListUrl] = React.useState([]);
     const [status, setStatus] = React.useState();
     const [openNotice, setOpenNotice] = React.useState(false);
@@ -162,6 +162,16 @@ const ProjectForm = (props) => {
                 if (res.status == 200) {
                     setStatus(1);//success
                     setOpenNotice(true);
+                    props.setSuccess(true);
+                    setPrjInfor({
+                        name: "",
+                        address: "",
+                        category_id: null,
+                        frontImage: "",
+                        interiorImage: [],
+                        frontImgPreview: "",
+                        interImgPreview: [],
+                    })
                 } else {
                     setStatus(0);//fail
                     setOpenNotice(true);
@@ -180,6 +190,11 @@ const ProjectForm = (props) => {
             })
 
     };
+
+    const handleCloseNotice = (index) => {
+        error.__html.splice(index, 1);
+        setError({ ...error, __html: [...error.__html] })
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -246,7 +261,7 @@ const ProjectForm = (props) => {
                                                                     color="inherit"
                                                                     size="small"
                                                                     onClick={() => {
-                                                                        setOpenNotice(!openNotice);
+                                                                        handleCloseNotice(index);
                                                                     }}
                                                                 >
                                                                     <CloseIcon fontSize="inherit" />

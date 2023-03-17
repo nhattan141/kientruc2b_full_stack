@@ -10,6 +10,8 @@ import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TablePagination from '@mui/material/TablePagination';
+import Pagination from '@mui/material/Pagination';
+import PaginationItem from '@mui/material/PaginationItem';
 import useTablePagination from '../../../HOC/useTablePagination';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
@@ -18,7 +20,10 @@ import IconButton from '@mui/material/IconButton';
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Tooltip from '@mui/material/Tooltip';
+import Skeleton from '@mui/material/Skeleton';
 import { green, grey, teal, red } from '@mui/material/colors';
+import axiosClient from '../../../axios.js';
+import Stack from '@mui/material/Stack';
 
 import ProjectForm from './ProjectForm';
 
@@ -75,22 +80,39 @@ const actionTheme = createTheme({
 })
 
 const ProjectManage = () => {
+    //get list project
+    const [projectList, setProjectList] = React.useState([]);
+    const [meta, setMeta] = React.useState({});
+    const [isSuccess, setSuccess] = React.useState(false);
+    const [isloading, setLoading] = React.useState(false);
+
+    const onPageClick = (link) => {
+        getProjectList(link.url);
+    }
+
+    const getProjectList = (url) => {
+        setLoading(true);
+        url = url || '/projects';
+        axiosClient.get(url)
+            .then(({ data }) => {
+                setLoading(false);
+                setProjectList(data.data);
+                setMeta(data.meta);
+            })
+    }
+
+    React.useEffect(() => {
+        getProjectList();
+    }, [isSuccess])
+
     // ==================== Pagination =================
-    let [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const handleChangePage = (event, link) => {
+        event.preventDefault();
+        if (!link.url) {
+            return;
+        }
 
-    const data = useTablePagination(rows, rowsPerPage);
-
-    let currentData = data.currentTableData();
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-        data.jumpPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
+        onPageClick(link)
     };
 
     //Đóng/mở form thêm mới/cập nhật (close/open creation/updation form)
@@ -185,58 +207,108 @@ const ProjectManage = () => {
                                 </TableRow>
                             </TableHead>
                         </ThemeProvider>
-                        <TableBody>
-                            {currentData.map((row, index) => (
-                                <TableRow
-                                    key={index}
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                >
-                                    <TableCell align="center">{index + 1}</TableCell>
-                                    <TableCell align="center">{row.name}</TableCell>
-                                    <TableCell align="center">{row.address}</TableCell>
-                                    <TableCell sx={{ display: "flex", justifyContent: "center" }}>
-                                        <Box sx={{ width: '35vw', height: '30vh' }}>
-                                            <Avatar variant="rounded" sx={{ width: '100%', height: '100%', background: 'white' }} alt="LOGO" src={row.img} />
-                                        </Box>
+                        {isloading &&
+                            (<TableBody>
+                                <TableRow>
+                                    <TableCell align="center">
+                                        <Skeleton width="100%" />
+                                        <Skeleton animation="wave" />
+                                        <Skeleton animation={false} />
                                     </TableCell>
                                     <TableCell align="center">
-                                        <ThemeProvider theme={actionTheme}>
-                                            <Tooltip title="Sửa" placement='top-start'>
-                                                <IconButton
-                                                    aria-label="update"
-                                                    size="large"
-                                                    color='primary'
-                                                    onClick={handleOpenUpdateForm}
-                                                >
-                                                    <CreateIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title="Xóa" placement='top-start' color='secondary'>
-                                                <IconButton aria-label="delete" size="large">
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </ThemeProvider>
+                                        <Skeleton width="100%" />
+                                        <Skeleton animation="wave" />
+                                        <Skeleton animation={false} />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Skeleton width="100%" />
+                                        <Skeleton animation="wave" />
+                                        <Skeleton animation={false} />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Skeleton width="100%" />
+                                        <Skeleton animation="wave" />
+                                        <Skeleton animation={false} />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Skeleton width="100%" />
+                                        <Skeleton animation="wave" />
+                                        <Skeleton animation={false} />
                                     </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
+                            </TableBody>)
+                        }
+                        {!isloading &&
+                            (<TableBody>
+                                {projectList.map((project, index) => (
+                                    <TableRow
+                                        key={index}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                        <TableCell align="center">{index + 1}</TableCell>
+                                        <TableCell align="center">{project.name}</TableCell>
+                                        <TableCell align="center">{project.address}</TableCell>
+                                        <TableCell sx={{ display: "flex", justifyContent: "center" }}>
+                                            <Box sx={{ width: '35vw', height: '30vh' }}>
+                                                <Avatar
+                                                    variant="rounded"
+                                                    sx={{ width: '100%', height: '100%', background: 'white' }}
+                                                    alt="LOGO"
+                                                    src={project.image_url.at(0).url} />
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <ThemeProvider theme={actionTheme}>
+                                                <Tooltip title="Sửa" placement='top-start'>
+                                                    <IconButton
+                                                        aria-label="update"
+                                                        size="large"
+                                                        color='primary'
+                                                        onClick={handleOpenUpdateForm}
+                                                    >
+                                                        <CreateIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Xóa" placement='top-start' color='secondary'>
+                                                    <IconButton aria-label="delete" size="large">
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </ThemeProvider>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>)
+                        }
                     </Table>
                 </TableContainer>
                 <Box sx={{ width: 1, mt: 3, }}>
-                    <TablePagination
-                        sx={{ p: 0 }}
-                        component="div"
-                        count={rows.length}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        rowsPerPageOptions={[5, 10, 25, 50, 100]}
-                    />
+                    <ThemeProvider theme={darkTheme}>
+                        <Stack
+                            direction="row"
+                            justifyContent="center"
+                            alignItems="center"
+                            spacing={2}
+                        >
+                            {meta.links && meta.links.map((link, index) => (
+                                <Button
+                                    key={index}
+                                    variant={link.active ? "contained" : "text"}
+                                    onClick={event => handleChangePage(event, link)}
+                                >
+                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                </Button>
+                            ))}
+                        </Stack>
+                    </ThemeProvider>
                 </Box>
             </Box>
-            <ProjectForm openDialog={openDialog} handleCloseForm={handleCloseForm} active={active} />
+            <ProjectForm
+                openDialog={openDialog}
+                handleCloseForm={handleCloseForm}
+                active={active}
+                setSuccess={setSuccess}
+            />
         </>
     );
 };
