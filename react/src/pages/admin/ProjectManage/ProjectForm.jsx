@@ -84,44 +84,16 @@ const ProjectForm = (props) => {
                     let interImgURL = reader.result;
                     listURL.unshift(interImgURL);
                     listFile.unshift(file);
+                    let interiorImageFile = prjInfor.interiorImage ? [...prjInfor.interiorImage] : [];
                     setPrjInfor({
                         ...prjInfor,
                         interImgPreview: [...listURL, ...prjInfor.interImgPreview],
-                        interiorImage: [...listFile, ...prjInfor.interiorImage]
+                        interiorImage: [...listFile, ...interiorImageFile]
                     });
 
                 }
                 reader.readAsDataURL(file)
             }
-            //     let file = data[i];
-            //     // console.log(file);
-            //     // reader.onload = () => {
-            //     //     setPrjInfor({
-            //     //         ...prjInfor,
-            //     //         interImgPreview: reader.result,
-            //     //         interiorImage: file
-            //     //     });
-
-            //     //     event.target.value = "";
-            //     // }
-            //     let interImgURL = reader.result;
-            //     listURL.unshift(interImgURL);
-            //     listFile.unshift(file);
-            // }
-            // reader.onload = () => {
-            //     setPrjInfor({
-            //         ...prjInfor,
-            //         interImgPreview: [...listURL, ...prjInfor.interImgPreview],
-            //         interiorImage: [...listFile, ...prjInfor.interiorImage]
-            //     });
-
-            //     event.target.value = "";
-            // }
-            // setPrjInfor({
-            //     ...prjInfor,
-            //     interImgPreview: [...listURL, ...prjInfor.interImgPreview],
-            //     interiorImage: [...listFile, ...prjInfor.interiorImage]
-            // });
         }
         else setPrjInfor({ ...prjInfor, [event.target.name]: event.target.value });
     };
@@ -129,22 +101,40 @@ const ProjectForm = (props) => {
     //chuc nang xoa hinh noi that
     const handleDeleteImg = (index) => {
         prjInfor.interImgPreview.splice(index, 1);
-        prjInfor.interiorImage.splice(index, 1);
+        prjInfor.interiorImage && prjInfor.interiorImage.splice(index, 1);
+        let interiorImageFile = prjInfor.interiorImage ? [...prjInfor.interiorImage] : [];
+
         setPrjInfor({
             ...prjInfor,
             interImgPreview: [...prjInfor.interImgPreview],
-            interiorImage: [...prjInfor.interiorImage]
+            interiorImage: [...interiorImageFile]
         });
     }
+
+    React.useEffect(() => {
+        if (props.projectId) {
+            axiosClient.get(`/projects/${props.projectId}`)
+                .then(({ data }) => {
+                    let interUrlList = data.data.image_url.filter((item) => {
+                        return item.type == "0"
+                    })
+                    setPrjInfor({
+                        name: data.data.name,
+                        address: data.data.address,
+                        category_id: data.data.category_id,
+                        frontImgPreview: data.data.image_url.at(0).url,
+                        interImgPreview: interUrlList.map(item => { return item.url })
+                    });
+                })
+        }
+    }, [props.projectId])
 
     React.useEffect(() => {
         setListUrl(prjInfor.interImgPreview);
     }, [prjInfor.interImgPreview]);
 
     const handleSubmit = (event) => {
-        // props.handleCloseForm();
         event.preventDefault();
-        // setError({ __html: '' });
 
         const payload = { ...prjInfor };
         if (payload.frontImage) {
@@ -157,26 +147,30 @@ const ProjectForm = (props) => {
         delete payload.frontImgPreview;
         delete payload.interImgPreview;
 
-        axiosClient.post('/projects', payload)
-            .then((res) => {
-                if (res.status == 200) {
-                    setStatus(1);//success
-                    setOpenNotice(true);
-                    props.setSuccess(true);
-                    setPrjInfor({
-                        name: "",
-                        address: "",
-                        category_id: null,
-                        frontImage: "",
-                        interiorImage: [],
-                        frontImgPreview: "",
-                        interImgPreview: [],
-                    })
-                } else {
-                    setStatus(0);//fail
-                    setOpenNotice(true);
-                }
-            })
+        let res = null;
+        props.active === 'create' ?
+            (res = axiosClient.post('/projects', payload)) :
+            (res = axiosClient.put(`/projects/${props.projectId}`, payload))
+
+        res.then((res) => {
+            if (res.status == 200) {
+                setStatus(1);//success
+                setOpenNotice(true);
+                props.setProjectId(null);
+                setPrjInfor({
+                    name: "",
+                    address: "",
+                    category_id: null,
+                    frontImage: "",
+                    interiorImage: [],
+                    frontImgPreview: "",
+                    interImgPreview: [],
+                })
+            } else {
+                setStatus(0);//fail
+                setOpenNotice(true);
+            }
+        })
             .catch((error) => {
                 setStatus(0);//fail
                 setOpenNotice(true);
@@ -289,7 +283,10 @@ const ProjectForm = (props) => {
                                                         }
                                                         sx={{ mb: 2 }}
                                                     >
-                                                        Thêm dự án thành công
+                                                        {props.active === 'create' ?
+                                                            'Thêm dự án thành công' :
+                                                            'Sửa dự án thành công'}
+
                                                     </Alert>
                                             }
                                         </Collapse>

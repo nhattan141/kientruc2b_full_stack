@@ -1,55 +1,17 @@
 import * as React from 'react';
-import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import TablePagination from '@mui/material/TablePagination';
-import Pagination from '@mui/material/Pagination';
-import PaginationItem from '@mui/material/PaginationItem';
-import useTablePagination from '../../../HOC/useTablePagination';
+import Grid from '@mui/material/Grid';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
-import IconButton from '@mui/material/IconButton';
-import CreateIcon from '@mui/icons-material/Create';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Tooltip from '@mui/material/Tooltip';
-import Skeleton from '@mui/material/Skeleton';
-import { green, grey, teal, red } from '@mui/material/colors';
+import { green, teal, red } from '@mui/material/colors';
 import axiosClient from '../../../axios.js';
 import Stack from '@mui/material/Stack';
+import Skeleton from '@mui/material/Skeleton';
 
 import ProjectForm from './ProjectForm';
-
-import project3 from '../../../assets/imgs/project3.jpg';
-
-function createData(name, address, img, action) {
-    return { name, address, img, action };
-}
-
-const rows = [
-    createData('1', '1', project3, '1'),
-    createData('2', '2', project3, '2'),
-    createData('3', '3', project3, '3'),
-    createData('4', '4', project3, '4'),
-    createData('5', '5', project3, '5'),
-    createData('6', '6', project3, '6'),
-    createData('7', '7', project3, '7'),
-    createData('8', '8', project3, '8'),
-    createData('9', '9', project3, '9'),
-    createData('10', '10', project3, '10'),
-    createData('11', '11', project3, '11'),
-    createData('12', '12', project3, '12'),
-    createData('13', '13', project3, '13'),
-    createData('14', '14', project3, '14'),
-    createData('15', '15', project3, '15')
-];
+import Card from '../../../layout/ProjectCard/Card';
 
 const btnTheme = createTheme({
     palette: {
@@ -83,8 +45,8 @@ const ProjectManage = () => {
     //get list project
     const [projectList, setProjectList] = React.useState([]);
     const [meta, setMeta] = React.useState({});
-    const [isSuccess, setSuccess] = React.useState(false);
     const [isloading, setLoading] = React.useState(false);
+    const [projectId, setProjectId] = React.useState();
 
     const onPageClick = (link) => {
         getProjectList(link.url);
@@ -103,7 +65,7 @@ const ProjectManage = () => {
 
     React.useEffect(() => {
         getProjectList();
-    }, [isSuccess])
+    }, [projectId])
 
     // ==================== Pagination =================
     const handleChangePage = (event, link) => {
@@ -131,7 +93,8 @@ const ProjectManage = () => {
         setActive('create');
     }
 
-    const handleOpenUpdateForm = () => {
+    const handleOpenUpdateForm = (projectId) => {
+        setProjectId(projectId);
         setOpenDialog(true);
         setActive('update');
     }
@@ -194,94 +157,32 @@ const ProjectManage = () => {
                         </Button>
                     </ThemeProvider>
                 </Box>
-                <TableContainer component={Paper} sx={{ mt: 3 }}>
-                    <Table sx={{ minWidth: 650, textTransform: "uppercase" }} aria-label="simple table">
-                        <ThemeProvider theme={darkTheme}>
-                            <TableHead>
-                                <TableRow sx={{ background: grey[900] }}>
-                                    <TableCell align="center">STT</TableCell>
-                                    <TableCell align="center">Tên dự án</TableCell>
-                                    <TableCell align="center">Địa chỉ</TableCell>
-                                    <TableCell align="center">Hình mặt tiền</TableCell>
-                                    <TableCell align="center">Tùy chỉnh</TableCell>
-                                </TableRow>
-                            </TableHead>
-                        </ThemeProvider>
-                        {isloading &&
-                            (<TableBody>
-                                <TableRow>
-                                    <TableCell align="center">
-                                        <Skeleton width="100%" />
-                                        <Skeleton animation="wave" />
-                                        <Skeleton animation={false} />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Skeleton width="100%" />
-                                        <Skeleton animation="wave" />
-                                        <Skeleton animation={false} />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Skeleton width="100%" />
-                                        <Skeleton animation="wave" />
-                                        <Skeleton animation={false} />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Skeleton width="100%" />
-                                        <Skeleton animation="wave" />
-                                        <Skeleton animation={false} />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Skeleton width="100%" />
-                                        <Skeleton animation="wave" />
-                                        <Skeleton animation={false} />
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>)
+                <Box sx={{ width: 1, mt: 3, }}>
+                    <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                        {
+                            (isloading ? Array.from(new Array(3)) : projectList).map((project, index) => (
+                                <Grid key={index} item xs={12} sm={6} md={4}>
+                                    {project ? (
+                                        <Card
+                                            id={project.id}
+                                            name={project.name}
+                                            address={project.address}
+                                            image_url={project.image_url.at(0).url}
+                                            category={project.category_id}
+                                            handleOpenUpdateForm={handleOpenUpdateForm}
+                                        />
+                                    ) : (
+                                        <Box>
+                                            <Skeleton variant="rectangular" sx={{ height: 200, width: 1 }} />
+                                            <Skeleton />
+                                            <Skeleton width="60%" />
+                                        </Box>
+                                    )}
+                                </Grid>
+                            ))
                         }
-                        {!isloading &&
-                            (<TableBody>
-                                {projectList.map((project, index) => (
-                                    <TableRow
-                                        key={index}
-                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                    >
-                                        <TableCell align="center">{index + 1}</TableCell>
-                                        <TableCell align="center">{project.name}</TableCell>
-                                        <TableCell align="center">{project.address}</TableCell>
-                                        <TableCell sx={{ display: "flex", justifyContent: "center" }}>
-                                            <Box sx={{ width: '35vw', height: '30vh' }}>
-                                                <Avatar
-                                                    variant="rounded"
-                                                    sx={{ width: '100%', height: '100%', background: 'white' }}
-                                                    alt="LOGO"
-                                                    src={project.image_url.at(0).url} />
-                                            </Box>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <ThemeProvider theme={actionTheme}>
-                                                <Tooltip title="Sửa" placement='top-start'>
-                                                    <IconButton
-                                                        aria-label="update"
-                                                        size="large"
-                                                        color='primary'
-                                                        onClick={handleOpenUpdateForm}
-                                                    >
-                                                        <CreateIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title="Xóa" placement='top-start' color='secondary'>
-                                                    <IconButton aria-label="delete" size="large">
-                                                        <DeleteIcon />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </ThemeProvider>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>)
-                        }
-                    </Table>
-                </TableContainer>
+                    </Grid>
+                </Box>
                 <Box sx={{ width: 1, mt: 3, }}>
                     <ThemeProvider theme={darkTheme}>
                         <Stack
@@ -304,10 +205,11 @@ const ProjectManage = () => {
                 </Box>
             </Box>
             <ProjectForm
+                projectId={projectId}
                 openDialog={openDialog}
                 handleCloseForm={handleCloseForm}
                 active={active}
-                setSuccess={setSuccess}
+                setProjectId={setProjectId}
             />
         </>
     );

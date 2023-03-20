@@ -22,7 +22,7 @@ class ProjectController extends Controller
     {
         return ProjectResource::collection(
             Project::orderBy('projects.created_at', 'desc')
-                ->paginate(5)
+                ->paginate(6)
         );
     }
 
@@ -74,7 +74,7 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project)
+    public function show(Project $project, Request $request)
     {
         return new ProjectResource($project);
     }
@@ -82,27 +82,83 @@ class ProjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Project $project, Request $request, Image $image)
+    public function edit(Project $project, Request $request)
     {
     }
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateProjectRequest  $request
+     * @param  \App\Models\Project  $survey
+     * @return \Illuminate\Http\Response
      */
-    public function update(UpdateProjectRequest $request, Project $project, Image $image)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
-        $data = $request;
+        $data = $request->validated();
 
-        //check if image is exist on local system
+        // Update project in the database
+        $project->update($data);
+        $prj_id = $project->latest()->first()->id;
+
+        // check if image is exist on local system
+        // $imageOfProjectUpdate = $image->where('project_id', $prj_id);
+        // $frontImagePath = $image->where('project_id', $imageOfProjectUpdate->where('type', 1));
+        // $interiorImgPath = $image->where('project_id', $imageOfProjectUpdate->where('type', 0));
+
         if (isset($data['frontImage'])) {
             $frontImagePath = $this->saveImage($data['frontImage']);
-            $data['frontImage'] = $frontImagePath;
+            $exitsFrontImagePath = Image::where('project_id', $prj_id)->where('type', 1)->pluck('url');
+            Image::where('project_id', $prj_id)
+                ->where('type', 1)
+                ->update(['url' => $frontImagePath]);
 
-            if ($image->url) {
-                $absolutePath = public_path($image->url);
+            // If there is an old image, delete it
+            if ($exitsFrontImagePath) {
+                $absolutePath = public_path($exitsFrontImagePath);
                 File::delete($absolutePath);
             }
         }
+        if (isset($data['interiorImage'])) {
+            $exitsInteriorImagePath = Image::where('project_id', $prj_id)
+                ->where('type', 0)->pluck('url');
+            foreach ($data['interiorImage'] as $image) {
+                if (preg_match('/^data:image\/(\w+);base64,/', $image, $type)) {
+                    $interiorImgPath = $this->saveImage($image);
+                    Image::create([
+                        'project_id' => $prj_id,
+                        'type' => 0,
+                        'url' => $interiorImgPath
+                    ]);
+                } else {
+                    // If there is an old image, delete it
+                    $exitsInteriorImagePath[] = substr($image, strpos($image, 'images'));
+                }
+            }
+
+            //find the item is appear one time
+            for ($i = 0; $i < count($exitsInteriorImagePath); $i++) {
+                $count = 1;
+                for ($j = 0; $j < count($exitsInteriorImagePath); $j++) {
+                    if ($exitsInteriorImagePath[$i] == $exitsInteriorImagePath[$j] && $i !== $j) {
+                        $count += 1;
+                    }
+                }
+                if ($count == 1) {
+                    //delete image in db
+                    Image::where('project_id', $prj_id)
+                        ->where('type', 0)
+                        ->where('url', $exitsInteriorImagePath[$i])
+                        ->delete();
+
+                    //delete image in system
+                    $absolutePath = public_path($exitsInteriorImagePath[$i]);
+                    File::delete($absolutePath);
+                }
+            }
+        }
+
+        return new ProjectResource($project);
     }
 
     /**
@@ -113,9 +169,9 @@ class ProjectController extends Controller
         //
     }
 
-    /** 
+    /**
      * save image on local system and return saved image path
-     * 
+     *
      * @param $image
      * @throws Exception
      * @author Admin
