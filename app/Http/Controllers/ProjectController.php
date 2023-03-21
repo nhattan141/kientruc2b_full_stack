@@ -101,11 +101,6 @@ class ProjectController extends Controller
         $project->update($data);
         $prj_id = $project->latest()->first()->id;
 
-        // check if image is exist on local system
-        // $imageOfProjectUpdate = $image->where('project_id', $prj_id);
-        // $frontImagePath = $image->where('project_id', $imageOfProjectUpdate->where('type', 1));
-        // $interiorImgPath = $image->where('project_id', $imageOfProjectUpdate->where('type', 0));
-
         if (isset($data['frontImage'])) {
             $frontImagePath = $this->saveImage($data['frontImage']);
             $exitsFrontImagePath = Image::where('project_id', $prj_id)->where('type', 1)->pluck('url');
@@ -164,9 +159,18 @@ class ProjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Project $project)
+    public function destroy(Project $project, Request $request)
     {
-        //
+        $project->delete();
+        $prj_id = $project->id;
+        $exitsInteriorImagePath = Image::where('project_id', $prj_id)->pluck('url');
+        foreach ($exitsInteriorImagePath as $path) {
+            //delete image in system
+            $absolutePath = public_path($path);
+            File::delete($absolutePath);
+        }
+        Image::where('project_id', $prj_id)->delete();
+        return response('', 204);
     }
 
     /**

@@ -5,13 +5,14 @@ import Grid from '@mui/material/Grid';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
-import { green, teal, red } from '@mui/material/colors';
+import { green } from '@mui/material/colors';
 import axiosClient from '../../../axios.js';
 import Stack from '@mui/material/Stack';
 import Skeleton from '@mui/material/Skeleton';
 
 import ProjectForm from './ProjectForm';
 import Card from '../../../layout/ProjectCard/Card';
+import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 
 const btnTheme = createTheme({
     palette: {
@@ -30,23 +31,14 @@ const darkTheme = createTheme({
     },
 });
 
-const actionTheme = createTheme({
-    palette: {
-        primary: {
-            main: teal[500],
-        },
-        secondary: {
-            main: red[500]
-        }
-    }
-})
-
 const ProjectManage = () => {
     //get list project
     const [projectList, setProjectList] = React.useState([]);
     const [meta, setMeta] = React.useState({});
     const [isloading, setLoading] = React.useState(false);
     const [projectId, setProjectId] = React.useState();
+    //check update or delete if success
+    const [isSuccess, setSuccess] = React.useState(false);
 
     const onPageClick = (link) => {
         getProjectList(link.url);
@@ -65,7 +57,7 @@ const ProjectManage = () => {
 
     React.useEffect(() => {
         getProjectList();
-    }, [projectId])
+    }, [isSuccess])
 
     // ==================== Pagination =================
     const handleChangePage = (event, link) => {
@@ -79,10 +71,8 @@ const ProjectManage = () => {
 
     //Đóng/mở form thêm mới/cập nhật (close/open creation/updation form)
     const [openDialog, setOpenDialog] = React.useState(false);
-
-    // const handleToggleDialog = () => {
-    //     setOpenDialog(!openDialog);
-    // };
+    // //Thay đổi active truyền vòa form thêm hoặc sửa (set active create/update for form)
+    const [active, setActive] = React.useState();
 
     const handleCloseForm = () => {
         setOpenDialog(false);
@@ -99,16 +89,16 @@ const ProjectManage = () => {
         setActive('update');
     }
 
-    // //Thay đổi active truyền vòa form thêm hoặc sửa (set active create/update for form)
-    const [active, setActive] = React.useState('create');
-
-    // let active = 'create';
-
-    // const handleOpenCreateForm = (activeType) => {
-    //     handleToggleDialog();
-    //     // setActive(activeType);
-    //     active = activeType;
-    // };
+    //set open for dialog confirm delete project
+    const [openConfirmDelete, setOpenConfirm] = React.useState(false);
+    const handleOpenConfirmDelete = (projectId) => {
+        setProjectId(projectId);
+        setOpenConfirm(true);
+    }
+    const handleCloseConfirmDelete = () => {
+        setProjectId(null);
+        setOpenConfirm(false);
+    }
 
     return (
         <>
@@ -170,6 +160,7 @@ const ProjectManage = () => {
                                             image_url={project.image_url.at(0).url}
                                             category={project.category_id}
                                             handleOpenUpdateForm={handleOpenUpdateForm}
+                                            handleOpenConfirmDelete={handleOpenConfirmDelete}
                                         />
                                     ) : (
                                         <Box>
@@ -210,6 +201,15 @@ const ProjectManage = () => {
                 handleCloseForm={handleCloseForm}
                 active={active}
                 setProjectId={setProjectId}
+                setSuccess={setSuccess}
+                isSuccess={isSuccess}
+            />
+            <ConfirmDeleteDialog
+                projectId={projectId}
+                openConfirmDelete={openConfirmDelete}
+                handleCloseConfirmDelete={handleCloseConfirmDelete}
+                setSuccess={setSuccess}
+                isSuccess={isSuccess}
             />
         </>
     );

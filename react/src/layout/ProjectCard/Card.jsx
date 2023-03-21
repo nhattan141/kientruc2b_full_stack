@@ -7,9 +7,18 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreateIcon from '@mui/icons-material/Create';
+import axiosClient from '../../axios';
 
 export default function MediaCard(props) {
-    const { id, name, address, image_url, category, handleOpenUpdateForm } = props;
+    const { id, name, address, image_url, category, handleOpenUpdateForm, handleOpenConfirmDelete } = props;
+    const [cateName, setCateName] = React.useState();
+
+    React.useEffect(() => {
+        axiosClient.get(`/categories/${category}`)
+            .then(({ data }) => {
+                setCateName(data.data.cate_name);
+            })
+    }, []);
 
     return (
         <Card sx={{ maxWidth: 1 }}>
@@ -26,7 +35,7 @@ export default function MediaCard(props) {
                     {address}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    {category}
+                    {cateName}
                 </Typography>
             </CardContent>
             <CardActions sx={{ justifyContent: "space-between" }}>
@@ -43,6 +52,7 @@ export default function MediaCard(props) {
                     variant="outlined"
                     color="error"
                     size="small"
+                    onClick={() => { handleOpenConfirmDelete(id) }}
                 >
                     Xóa
                 </Button>

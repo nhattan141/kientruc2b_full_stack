@@ -111,6 +111,24 @@ const ProjectForm = (props) => {
         });
     }
 
+    const setEmptyInput = () => {
+        setPrjInfor({
+            name: "",
+            address: "",
+            category_id: null,
+            frontImage: "",
+            interiorImage: [],
+            frontImgPreview: "",
+            interImgPreview: [],
+        })
+    }
+
+    React.useEffect(() => {
+        if (props.active == "create") {
+            setEmptyInput();
+        }
+    }, [props.active]);
+
     React.useEffect(() => {
         if (props.projectId) {
             axiosClient.get(`/projects/${props.projectId}`)
@@ -157,15 +175,8 @@ const ProjectForm = (props) => {
                 setStatus(1);//success
                 setOpenNotice(true);
                 props.setProjectId(null);
-                setPrjInfor({
-                    name: "",
-                    address: "",
-                    category_id: null,
-                    frontImage: "",
-                    interiorImage: [],
-                    frontImgPreview: "",
-                    interImgPreview: [],
-                })
+                props.setSuccess(!props.isSuccess)
+                setEmptyInput();
             } else {
                 setStatus(0);//fail
                 setOpenNotice(true);
@@ -374,10 +385,10 @@ const ProjectForm = (props) => {
                                         sx={{
                                             width: { xs: '100%' },
                                             height: 720,
-                                            overflowY: 'scroll',
+                                            overflowY: "scroll"
                                         }}
                                     >
-                                        <ImageList cols={3} rowHeight={164}>
+                                        <ImageList cols={3} rowHeight={200} sx={{ overflowY: "none" }}>
                                             {listUrl
                                                 && listUrl.map((item, index) => (
                                                     <ImageListItem key={index}>
