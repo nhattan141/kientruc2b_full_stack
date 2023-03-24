@@ -20,9 +20,11 @@ use App\Http\Controllers\CategoryController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/admin', [AuthController::class, 'admin']);
-    Route::apiResource('projects', ProjectController::class);
-    Route::apiResource('categories', CategoryController::class);
 });
+
+Route::apiResource('projects', ProjectController::class);
+Route::get('/prjCategory/{id}', [ProjectController::class, 'showProjectOfCategory']);
+Route::apiResource('categories', CategoryController::class);
 
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);

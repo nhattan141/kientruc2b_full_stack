@@ -22,7 +22,7 @@ class ProjectController extends Controller
     {
         return ProjectResource::collection(
             Project::orderBy('projects.created_at', 'desc')
-                ->paginate(6)
+                ->paginate(9)
         );
     }
 
@@ -77,6 +77,15 @@ class ProjectController extends Controller
     public function show(Project $project, Request $request)
     {
         return new ProjectResource($project);
+    }
+
+    public function showProjectOfCategory(String $id)
+    {
+        return ProjectResource::collection(
+            Project::where('category_id', $id)
+                ->orderBy('projects.created_at', 'desc')
+                ->paginate(9)
+        );
     }
 
     /**

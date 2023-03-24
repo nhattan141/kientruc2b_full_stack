@@ -1,205 +1,110 @@
 import * as React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import usePagination from '../../../HOC/usePagination';
-
-import { Typography, Grid, Box, Stack, Pagination } from '@mui/material';
-
-import './ListProject.scss';
-
+import { useParams } from 'react-router-dom';
+import { Grid, Box, Stack, Button, Skeleton } from '@mui/material';
 import TitlePage from '../../../layout/UserLayout/TitlePage/TitlePage';
 import ProjectCard from '../../../layout/UserLayout/ProjectCard/ProjectCard';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import axiosClient from '../../../axios';
+import './ListProject.scss';
 
-import project1 from '../../../assets/imgs/project1.jpg';
-import project2 from '../../../assets/imgs/project2.jpg';
-import project3 from '../../../assets/imgs/project3.jpg';
-import project4 from '../../../assets/imgs/project4.jpg';
-import project5 from '../../../assets/imgs/project5.jpg';
-import project6 from '../../../assets/imgs/project6.jpg';
-import project7 from '../../../assets/imgs/project7.jpg';
-import project8 from '../../../assets/imgs/project8.jpg';
-import project9 from '../../../assets/imgs/project9.jpg';
+
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+        primary: {
+            main: '#333',
+        },
+    },
+});
 
 const ListProject = () => {
     let { cate_id } = useParams();
 
-    const projects = [
-        {
-            id: 1,
-            proPic: project1,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 2,
-            proPic: project2,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 3,
-            proPic: project3,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 4,
-            proPic: project4,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 5,
-            proPic: project5,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 6,
-            proPic: project6,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 7,
-            proPic: project1,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 8,
-            proPic: project2,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 9,
-            proPic: project3,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 10,
-            proPic: project4,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 11,
-            proPic: project5,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 12,
-            proPic: project6,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 13,
-            proPic: project7,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 14,
-            proPic: project8,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 15,
-            proPic: project9,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 16,
-            proPic: project7,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 17,
-            proPic: project8,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 18,
-            proPic: project9,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 19,
-            proPic: project8,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 20,
-            proPic: project9,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 21,
-            proPic: project8,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 22,
-            proPic: project9,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-        {
-            id: 23,
-            proPic: project8,
-            title: 'Fioretty Villa',
-            city: 'Phường 8, thành phố Đà Lạt',
-        },
-    ];
+    //get list project
+    const [projectList, setProjectList] = React.useState([]);
+    const [meta, setMeta] = React.useState({});
+    const [isloading, setLoading] = React.useState(false);
+
+    React.useEffect(() => {
+        setLoading(true);
+        axiosClient.get(`/prjCategory/${cate_id}`)
+            .then(({ data }) => {
+                setProjectList(data.data);
+                setMeta(data.meta);
+                setLoading(false);
+            })
+    }, [cate_id])
 
     // ==================== Pagination =================
-    let [page, setPage] = React.useState(1);
-    const itemsPerPage = 9;
+    const handleChangePage = (event, link) => {
+        event.preventDefault();
+        if (!link.url) {
+            return;
+        }
 
-    const data = usePagination(projects, itemsPerPage);
-
-    let currentData = data.currentData();
-
-    const handleChangePage = (e, p) => {
-        setPage(p);
-        data.jumpPage(p);
+        onPageClick(link)
     };
 
     return (
         <div className="list-project">
             <TitlePage />
-            <Box sx={{ flexGrow: 1, padding: '20px' }}>
-                <Grid container spacing={2} sx={{
-                    // marginLeft: '-16px',
-                    marginTop: 0,
+            <Box
+                sx={{
+                    my: 6,
+                    mx: 4,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                <Box sx={{
+                    width: 1, mt: 3
                 }}>
-                    {currentData.map((project, index) => {
-                        return (
-                            <Grid item xs={12} md={4} key={index} >
-                                <ProjectCard
-                                    id={project.id}
-                                    title={project.title}
-                                    image={project.proPic}
-                                    address={project.city}
-                                />
-                            </Grid>
-                        )
-                    })
-                    }
-                </Grid>
+                    <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                        {
+                            (isloading ? Array.from(new Array(3)) : projectList).map((project, index) => (
+                                <Grid key={index} item xs={12} sm={6} md={4}>
+                                    {project ? (
+                                        <ProjectCard
+                                            id={project.id}
+                                            title={project.name}
+                                            image={project.image_url.at(0).url}
+                                            address={project.address}
+                                            category={project.category_id}
+                                        />
+                                    ) : (
+                                        <Box>
+                                            <Skeleton variant="rectangular" sx={{ height: 200, width: 1 }} />
+                                            <Skeleton />
+                                            <Skeleton width="60%" />
+                                        </Box>
+                                    )}
+                                </Grid>
+                            ))
+                        }
+                    </Grid>
+                </Box>
+                <Box sx={{ width: 1, mt: 3, }}>
+                    <ThemeProvider theme={darkTheme}>
+                        <Stack
+                            direction="row"
+                            justifyContent="center"
+                            alignItems="center"
+                            spacing={2}
+                        >
+                            {meta.links && meta.links.map((link, index) => (
+                                <Button
+                                    key={index}
+                                    variant={link.active ? "contained" : "text"}
+                                    onClick={event => handleChangePage(event, link)}
+                                >
+                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                </Button>
+                            ))}
+                        </Stack>
+                    </ThemeProvider>
+                </Box>
             </Box>
-            <Pagination count={data.maxPage} page={page} onChange={handleChangePage} boundaryCount={2} />
         </div >
     )
 };

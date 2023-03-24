@@ -39,18 +39,18 @@ const Header = () => {
                                     <AddIcon />
                                 </label>
                                 <ul>
-                                    <li><Link to={'/category/house'}>Nhà phố</Link></li>
-                                    <li><Link to={'/category/villa'}>Biệt thự</Link></li>
-                                    <li><Link to={'/category/office'}>Văn phòng</Link></li>
-                                    <li><Link to={'/category/hotel'}>Khách sạn</Link></li>
+                                    <li><Link to={'/category/1'}>Nhà phố</Link></li>
+                                    <li><Link to={'/category/2'}>Biệt thự</Link></li>
+                                    <li><Link to={'/category/3'}>Văn phòng</Link></li>
+                                    <li><Link to={'/category/4'}>Khách sạn</Link></li>
                                 </ul>
                             </div>
-                            <li><Link to={'/category/building'}>Xây dựng</Link></li>
-                            <li><Link to={'/category/apartment'}>Chung cư</Link></li>
-                            <li><Link to={'/category/restaurant'}>Nhà hàng</Link></li>
-                            <li><Link to={'/category/about'}>Giới thiệu</Link></li>
+                            <li><Link to={'/category/5'}>Xây dựng</Link></li>
+                            <li><Link to={'/category/6'}>Chung cư</Link></li>
+                            <li><Link to={'/category/7'}>Nhà hàng</Link></li>
+                            <li><a href='#footer-container'>Giới thiệu</a></li>
                             <li><Link to={'/category/phongthuy'}>Phong thủy</Link></li>
-                            <li><Link to={'/category/contact'}>Liên hệ</Link></li>
+                            <li><a href='#footer-container'>Liên hệ</a></li>
                         </div>
                     </div>
                 </div>

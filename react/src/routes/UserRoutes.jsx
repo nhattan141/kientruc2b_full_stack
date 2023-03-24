@@ -16,7 +16,7 @@ const UserRoutes = {
         },
         {
             path: 'category/:cate_id',
-            element: <ListProject />
+            element: <ListProject />,
         },
         {
             path: 'project/:project_id',

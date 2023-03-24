@@ -148,7 +148,7 @@ const ProjectManage = () => {
                     </ThemeProvider>
                 </Box>
                 <Box sx={{ width: 1, mt: 3, }}>
-                    <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                    <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                         {
                             (isloading ? Array.from(new Array(3)) : projectList).map((project, index) => (
                                 <Grid key={index} item xs={12} sm={6} md={4}>
@@ -158,7 +158,7 @@ const ProjectManage = () => {
                                             name={project.name}
                                             address={project.address}
                                             image_url={project.image_url.at(0).url}
-                                            category={project.category_id}
+                                            category={project.category_name}
                                             handleOpenUpdateForm={handleOpenUpdateForm}
                                             handleOpenConfirmDelete={handleOpenConfirmDelete}
                                         />
