@@ -34,12 +34,14 @@ const TitlePage = () => {
         if (project_id) {
             getInfor();
         }
-        if (cate_id) {
+        if (cate_id && cate_id != "all") {
             let categoryUrl = cate_id ? `/categories/${cate_id}` : `/categories/${projectInfor.category_id}`
             axiosClient.get(categoryUrl)
                 .then(({ data }) => {
                     setCategory(data.data.cate_name);
                 });
+        } else {
+            setCategory("Tất cả")
         }
 
     }, [project_id, cate_id]);

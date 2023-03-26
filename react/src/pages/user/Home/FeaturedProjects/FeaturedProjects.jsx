@@ -63,7 +63,7 @@ const FeaturedProjects = () => {
                         }
                     </Grid>
                 </Box>
-                <Link className="all_btn" to={"/category/1"}>Xem dự án khác</Link>
+                <Link className="all_btn" to={"/category/all"}>Xem tất cả dự án</Link>
             </Box>
         </div >
     )

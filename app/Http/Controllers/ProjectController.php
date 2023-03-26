@@ -81,6 +81,12 @@ class ProjectController extends Controller
 
     public function showProjectOfCategory(String $id)
     {
+        if ($id == "all") {
+            return ProjectResource::collection(
+                Project::orderBy('projects.created_at', 'desc')
+                    ->paginate(9)
+            );
+        }
         return ProjectResource::collection(
             Project::where('category_id', $id)
                 ->orderBy('projects.created_at', 'desc')

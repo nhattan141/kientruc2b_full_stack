@@ -7,12 +7,14 @@ import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
 import { green } from '@mui/material/colors';
 import axiosClient from '../../../axios.js';
-import Stack from '@mui/material/Stack';
+import Pagination from '@mui/material/Pagination';
 import Skeleton from '@mui/material/Skeleton';
 
 import ProjectForm from './ProjectForm';
 import Card from '../../../layout/ProjectCard/Card';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
+
+import './ProjectManage.scss';
 
 const btnTheme = createTheme({
     palette: {
@@ -37,6 +39,7 @@ const ProjectManage = () => {
     const [meta, setMeta] = React.useState({});
     const [isloading, setLoading] = React.useState(false);
     const [projectId, setProjectId] = React.useState();
+    const [page, setPage] = React.useState(1);
     //check update or delete if success
     const [isSuccess, setSuccess] = React.useState(false);
 
@@ -60,13 +63,13 @@ const ProjectManage = () => {
     }, [isSuccess])
 
     // ==================== Pagination =================
-    const handleChangePage = (event, link) => {
-        event.preventDefault();
-        if (!link.url) {
+    const handleChangePage = (event, value) => {
+        if (!meta.links.at(value).url) {
             return;
         }
 
-        onPageClick(link)
+        setPage(value);
+        onPageClick(meta.links.at(value));
     };
 
     //Đóng/mở form thêm mới/cập nhật (close/open creation/updation form)
@@ -174,25 +177,8 @@ const ProjectManage = () => {
                         }
                     </Grid>
                 </Box>
-                <Box sx={{ width: 1, mt: 3, }}>
-                    <ThemeProvider theme={darkTheme}>
-                        <Stack
-                            direction="row"
-                            justifyContent="center"
-                            alignItems="center"
-                            spacing={2}
-                        >
-                            {meta.links && meta.links.map((link, index) => (
-                                <Button
-                                    key={index}
-                                    variant={link.active ? "contained" : "text"}
-                                    onClick={event => handleChangePage(event, link)}
-                                >
-                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                </Button>
-                            ))}
-                        </Stack>
-                    </ThemeProvider>
+                <Box sx={{ mt: 5 }}>
+                    <Pagination count={meta.last_page} page={page} onChange={handleChangePage} boundaryCount={2} />
                 </Box>
             </Box>
             <ProjectForm

@@ -28,6 +28,15 @@ const Bubble = () => {
             behavior: 'smooth'
         })
     }
+
+    const handleCallUs = () => {
+        let phoneCall = "tel: +0908235246";
+        var a = document.createElement("a");
+        a.href = phoneCall;
+        // a.target = '_blank';
+        a.click();
+    }
+
     return (
         <div className="bubble-container">
             <div className="bubble-content">
@@ -43,7 +52,10 @@ const Bubble = () => {
                         >
                             <ArrowUpwardIcon />
                         </button>
-                        <button style={{ ['--delay']: ".5s" }}>
+                        <button
+                            onClick={handleCallUs}
+                            style={{ ['--delay']: ".5s" }}
+                        >
                             <LocalPhoneIcon />
                         </button>
                     </div>

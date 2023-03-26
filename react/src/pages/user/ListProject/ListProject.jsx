@@ -3,19 +3,9 @@ import { useParams } from 'react-router-dom';
 import { Grid, Box, Stack, Button, Skeleton } from '@mui/material';
 import TitlePage from '../../../layout/UserLayout/TitlePage/TitlePage';
 import ProjectCard from '../../../layout/UserLayout/ProjectCard/ProjectCard';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import axiosClient from '../../../axios';
 import './ListProject.scss';
-
-
-const darkTheme = createTheme({
-    palette: {
-        mode: 'dark',
-        primary: {
-            main: '#333',
-        },
-    },
-});
+import Pagination from '@mui/material/Pagination';
 
 const ListProject = () => {
     let { cate_id } = useParams();
@@ -25,25 +15,36 @@ const ListProject = () => {
     const [meta, setMeta] = React.useState({});
     const [isloading, setLoading] = React.useState(false);
 
-    React.useEffect(() => {
+    const [page, setPage] = React.useState(1);
+
+    const getProjectList = (url) => {
         setLoading(true);
-        axiosClient.get(`/prjCategory/${cate_id}`)
+        url = url || `/prjCategory/${cate_id}`;
+        axiosClient.get(url)
             .then(({ data }) => {
+                setLoading(false);
                 setProjectList(data.data);
                 setMeta(data.meta);
-                setLoading(false);
             })
+    }
+
+    React.useEffect(() => {
+        getProjectList();
     }, [cate_id])
 
     // ==================== Pagination =================
-    const handleChangePage = (event, link) => {
-        event.preventDefault();
-        if (!link.url) {
+    const handleChangePage = (event, value) => {
+        if (!meta.links.at(value).url) {
             return;
         }
 
-        onPageClick(link)
+        setPage(value);
+        onPageClick(meta.links.at(value));
     };
+
+    const onPageClick = (link) => {
+        getProjectList(link.url);
+    }
 
     return (
         <div className="list-project">
@@ -84,25 +85,8 @@ const ListProject = () => {
                         }
                     </Grid>
                 </Box>
-                <Box sx={{ width: 1, mt: 3, }}>
-                    <ThemeProvider theme={darkTheme}>
-                        <Stack
-                            direction="row"
-                            justifyContent="center"
-                            alignItems="center"
-                            spacing={2}
-                        >
-                            {meta.links && meta.links.map((link, index) => (
-                                <Button
-                                    key={index}
-                                    variant={link.active ? "contained" : "text"}
-                                    onClick={event => handleChangePage(event, link)}
-                                >
-                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                </Button>
-                            ))}
-                        </Stack>
-                    </ThemeProvider>
+                <Box sx={{ mt: 5 }}>
+                    <Pagination count={meta.last_page} page={page} onChange={handleChangePage} boundaryCount={2} />
                 </Box>
             </Box>
         </div >
