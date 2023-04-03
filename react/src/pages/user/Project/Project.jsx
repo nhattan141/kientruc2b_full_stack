@@ -69,7 +69,7 @@ const Project = () => {
                             projectimg ? (
                                 <SwiperSlide key={index}>
                                     <Avatar
-                                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        sx={{ width: '100%', height: '100%' }}
                                         variant="square"
                                         alt="Product"
                                         src={projectimg}

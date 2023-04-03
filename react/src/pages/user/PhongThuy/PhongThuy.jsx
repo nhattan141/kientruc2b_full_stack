@@ -78,7 +78,7 @@ const PhongThuy = () => {
                 }}>
                     Trong đó:
                 </Typography>
-                <List dense="true">
+                <List>
                     <ListItem >
                         <ListItemIcon>
                             <AutoAwesomeIcon />
