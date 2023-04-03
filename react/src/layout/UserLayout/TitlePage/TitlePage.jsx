@@ -6,7 +6,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import './TitlePage.scss';
 import axiosClient from "../../../axios";
 
-const TitlePage = () => {
+const TitlePage = (props) => {
     let { project_id, cate_id } = useParams();
 
     const [projectInfor, setInfor] = React.useState({
@@ -73,7 +73,13 @@ const TitlePage = () => {
                             {isloading ?
                                 <Skeleton sx={{ width: 300, height: 60 }} />
                                 :
-                                cate_id ? category : projectInfor.name}
+                                //Neu co prop la phong thuy thi lay gia tri cua prop
+                                //Neu ko co thi xet cate_id
+                                props.phongthuy ?
+                                    props.phongthuy :
+                                    cate_id ?
+                                        category :
+                                        projectInfor.name}
                         </Typography>
                     </Grid>
                     <Grid item md={12}>
@@ -92,21 +98,28 @@ const TitlePage = () => {
                                 isloading ?
                                     <Skeleton animation="wave" sx={{ width: 100, height: 40 }} />
                                     :
-                                    cate_id
-                                        ?
-                                        <Link to={`/category/${cate_id}`}>
-                                            {category}
+                                    //Neu co prop la phong thuy thi lay gia tri cua prop
+                                    //Neu ko co thi xet cate_id
+                                    props.phongthuy ?
+                                        <Link to={`/phongthuy`}>
+                                            {props.phongthuy}
                                         </Link>
                                         :
-                                        <>
-                                            <Link to={`/category/${projectInfor.category_id}`} >
-                                                {projectInfor.category_name}
+                                        cate_id
+                                            ?
+                                            <Link to={`/category/${cate_id}`}>
+                                                {category}
                                             </Link>
-                                            <ArrowForwardIosIcon sx={{ fontSize: '12px' }} />
-                                            <Link to={`/project/${project_id}`}>
-                                                {projectInfor.name}
-                                            </Link>
-                                        </>
+                                            :
+                                            <>
+                                                <Link to={`/category/${projectInfor.category_id}`} >
+                                                    {projectInfor.category_name}
+                                                </Link>
+                                                <ArrowForwardIosIcon sx={{ fontSize: '12px' }} />
+                                                <Link to={`/project/${project_id}`}>
+                                                    {projectInfor.name}
+                                                </Link>
+                                            </>
                             }
                         </Stack>
                     </Grid>

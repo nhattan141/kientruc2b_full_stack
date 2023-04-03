@@ -34,7 +34,7 @@ const Project = () => {
 
     return (
         <div className="project">
-            <TitlePage category={"category"} />
+            <TitlePage />
             <Box sx={{
                 // flexGrow: 1,
                 // padding: '20px',

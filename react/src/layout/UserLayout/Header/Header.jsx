@@ -48,8 +48,8 @@ const Header = () => {
                             <li><Link to={'/category/5'}>Xây dựng</Link></li>
                             <li><Link to={'/category/6'}>Chung cư</Link></li>
                             <li><Link to={'/category/7'}>Nhà hàng</Link></li>
+                            <li><Link to={'/phongthuy'}>Phong thủy</Link></li>
                             <li><a href='#footer-container'>Giới thiệu</a></li>
-                            <li><Link to={'/category/phongthuy'}>Phong thủy</Link></li>
                             <li><a href='#footer-container'>Liên hệ</a></li>
                         </div>
                     </div>

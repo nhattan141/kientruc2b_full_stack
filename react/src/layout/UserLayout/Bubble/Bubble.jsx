@@ -30,7 +30,7 @@ const Bubble = () => {
     }
 
     const handleCallUs = () => {
-        let phoneCall = "tel: +0908235246";
+        let phoneCall = "tel: 0908235246";
         var a = document.createElement("a");
         a.href = phoneCall;
         // a.target = '_blank';
